@@ -3,26 +3,27 @@ module.exports = function(app) {
     app.get('/produtos', function(request, response) {
 
         var connection = app.infra.connectionFactory();
-        var produtosBanco = new app.infra.ProdutosDAO(connection);
+        var produtosDAO = new app.infra.ProdutosDAO(connection);
 
-        produtosBanco.lista(function(error, result) {
+        produtosDAO.lista(function(error, result) {
             response.render('produtos/lista', { produtos: result });
         })
 
         connection.end();
     });
 
+    app.get('/produtos/form', function(request, response) {
+        response.render('produtos/form');
+    });
 
-    app.get('produtos/remove', function() {
+    app.post('/produtos', function(request, response) {
 
+        var produto = request.body;
         var connection = app.infra.connectionFactory();
-        var produtosBanco = new app.infra.ProdutosDAO(connection);
-        
-        var produto = produtosBanco.carrega(id, callback);
+        var produtosDAO = new app.infra.ProdutosDAO(connection);
 
-        if(produto) {
-
-            produtosBanco.remove(connection, produto, callback);
-        }
-    })
+        produtosDAO.salvar(produto, function(error, result) {
+            response.redirect('/produtos');
+        })
+    });
 }
